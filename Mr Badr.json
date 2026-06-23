@@ -1,0 +1,840 @@
+{
+  "name": "Mr Badr",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "1fK5kRytMj-KxO3yQ6TyP8yENoghRYe0d",
+          "mode": "list",
+          "cachedResultName": "SSUM_Job_Classification_Guide.txt",
+          "cachedResultUrl": "https://drive.google.com/file/d/1fK5kRytMj-KxO3yQ6TyP8yENoghRYe0d/view?usp=drivesdk"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -960,
+        576
+      ],
+      "id": "14007d35-2658-4c45-8864-7c8575691c94",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "QPulTKrExZaejVcI",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -736,
+        464
+      ],
+      "id": "49afdd56-969e-4bf3-b2a1-6566dde64674",
+      "name": "Supabase Vector Store",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bdp7Ge0FfCSktpvo",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "dataType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -672,
+        688
+      ],
+      "id": "ed61234d-51a6-4eb1-8771-140640de8cf6",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.messages?.[0]?.text?.body || $node[\"Transcribe a recording\"].json[\"text\"] }}",
+        "options": {
+          "systemMessage": "=Role: You are the official AI Knowledge Specialist for \"منصة اعتمد\" (i3tamid Platform). Your mission is to provide professional, precise, and high-quality support by ALWAYS calling the Vector Store Tool as your first step for every inquiry.\n\nIdentity & Branding:\n\nYou are the \"i3tamid Assistant\" (مساعد منصة اعتمد).\n\nAlways mention \"منصة اعتمد\" in your Arabic responses to reinforce the brand.\n\nLanguage & Grammar Rules (CRITICAL):\n\n1. Detect the user's language strictly (Bengali, Hindi, Punjabi, English, etc.).\n2. You MUST respond ONLY in the EXACT SAME language the user uses.\n\nGrammar Perfection: Ensure your Arabic is grammatically correct (Nahw) and free of spelling errors. Do not use slang or \"broken\" Arabic.\n\nGreeting Protocol:\n\nIf the user greets you, reply warmly in their language and immediately provide these two intro links:\n\nhttps://go.screenpal.com/watch/cOelldnZg58\n\nhttps://go.screenpal.com/watch/cOelldnZg5P\n\nExecution & Accuracy Strategy:\n\nSearch First: You must call the Vector Store Tool before answering any question to ensure data comes from the PDF.\n\nOne Question, One Answer: Focus strictly on answering the user's specific current question. Do not merge unrelated topics or provide extra information from different parts of the documents unless requested.\n\nFallback Logic: If the answer is not in the PDF, use your general intelligence to provide a logical, smart, and professional response that fits the platform’s context. Never say \"I don't know.\"\n\nTone & Formatting: Professional, smart, and proactive. Use bullet points, clear headings, and professional emojis.\n\nYou are a smart assistant for SSUM Company. Your main task is to help users register for the Professional Classification (التصنيف المهني).\n\nOperating Rules:\n\nIf the user asks about the \"Registration steps for Professional Classification\" (خطوات التسجيل في التصنيف المهني) or how to start, answer briefly and then immediately ask: \"What is your current job title?\".\n\nOnce the user mentions their job title, search the Vector Store (database) to identify their \"Job Level\" (Leadership, Specialist, Technical, or Supervisory).\n\nBased on the classification found, send the user their specific form link as follows:\n\nIf the level is (Leadership / قيادي): Send this link: [https://mgqtjshmbcelhxksnlfz.supabase.co/storage/v1/object/public/i3tamid/Leadership_Classification_Job_Description_Form_Formatted.docx]\n\nIf the level is (Specialist / تخصصي): Send this link: [https://mgqtjshmbcelhxksnlfz.supabase.co/storage/v1/object/public/i3tamid/Specialist_Level_Job_Description_Form_English.docx]\n\nIf the level is (Technical / فني): Send this link: [https://mgqtjshmbcelhxksnlfz.supabase.co/storage/v1/object/public/i3tamid/Technical_Level_Job_Description_Form_English.docx]\n\nIf the level is (Supervisory / إشرافي): Send this link: [https://mgqtjshmbcelhxksnlfz.supabase.co/storage/v1/object/public/i3tamid/Supervisory_classification_Job_Description%20form.docx]\n\nAdditional Instructions: After sending the link, tell the user: \"Please print the form, fill it out manually, have it stamped by your employer, and send it back to us here.\"\n\nImportant Note: If you cannot find the job title in the database, ask the user for a brief description of their job duties so you can assist them accurately.\n\n- When the user asks about \"الترخيص المهني\", \"رخصة مزاولة المهنة\", \"Professional Licensing\", or \"Professional License\", provide the natural helpful answer based on the company knowledge. At the very end of your response, on a new line, you MUST append this exact link: [https://mgqtjshmbcelhxksnlfz.supabase.co/storage/v1/object/public/i3tamid/Professional%20Licensing%20Steps.pdf]\n\n- When the user asks about \"التصنيف المهني\", \"شهادة التصنيف المهني\", \"Professional Classification\", or \"Classification Certificate\", provide the natural helpful answer based on the company knowledge. At the very end of your response, on a new line, you MUST append this exact link: [https://mgqtjshmbcelhxksnlfz.supabase.co/storage/v1/object/public/i3tamid/Professional%20Classification%20Steps.pdf]\n",
+          "returnIntermediateSteps": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -432,
+        288
+      ],
+      "id": "364f916d-214f-4133-947a-956a35345d21",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -960,
+        272
+      ],
+      "id": "ae8dca94-a09a-4570-8c1f-b0237202bd0f",
+      "name": "WhatsApp Trigger",
+      "webhookId": "30237acf-36ec-4cad-a309-61f61d55d0ac",
+      "credentials": {
+        "whatsAppTriggerApi": {
+          "id": "VkkCWiO8zUXUbSvT",
+          "name": "WhatsApp OAuth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $('AI Agent').item.json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        288
+      ],
+      "id": "344e50e3-409f-498b-9bee-b5882c2b2e85",
+      "name": "Send message",
+      "webhookId": "3fe878a2-ebeb-40da-845f-8d375dff6608",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "5TJkebMKhMYX4Xqh",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "retrieve-as-tool",
+        "toolDescription": "Call this tool t look up the ssum chatbot knowledge base",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "topK": 5,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -320,
+        496
+      ],
+      "id": "67c0beb4-912f-4068-adc0-cba7202ef29a",
+      "name": "Supabase Vector Store1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bdp7Ge0FfCSktpvo",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-4o",
+          "mode": "list",
+          "cachedResultName": "gpt-4o"
+        },
+        "builtInTools": {},
+        "options": {
+          "maxTokens": -1,
+          "temperature": 0.7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        -480,
+        576
+      ],
+      "id": "6c6f0931-5da5-4997-b729-bbf7b66cc98f",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "8FchnRRbkOizmgoI",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -400,
+        720
+      ],
+      "id": "a6a47002-f11b-4ce4-8cdd-cc1068efba1d",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "8FchnRRbkOizmgoI",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e5bacfc9-951b-4b14-ab2e-6bde631439de"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "voice path"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "596d1dc5-97de-4b47-81ca-0f659fe67085",
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text path"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -752,
+        112
+      ],
+      "id": "f85f777a-921e-4afe-9298-1d6205013782",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "operation": "transcribe",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        -368,
+        64
+      ],
+      "id": "b1a39013-7c3a-439c-a7e3-70da2d464a74",
+      "name": "Transcribe a recording",
+      "credentials": {
+        "openAiApi": {
+          "id": "8FchnRRbkOizmgoI",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "={{ $node[\"WhatsApp Trigger\"].json.messages[0].audio.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -560,
+        80
+      ],
+      "id": "90982499-b201-40a7-b5fc-4d496b15b1ef",
+      "name": "HTTP Request",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "8uLT0QxQM7GgtPTc",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $item(0).$node[\"WhatsApp Trigger\"].json.messages[0].type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "22b9e1c3-0dcf-4cf0-9dc9-9d984f5630dc"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "reply with text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "e0ee7a9b-16ba-4b5a-8f84-bcedf384c179",
+                    "leftValue": "={{ $item(0).$node[\"WhatsApp Trigger\"].json.messages[0].type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "reply with audio"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        144,
+        320
+      ],
+      "id": "08bc3cc6-0b35-4887-91b9-1a631d02823c",
+      "name": "Switch1"
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        864,
+        480
+      ],
+      "id": "df668a92-0643-461c-8519-a2b36e0b6a99",
+      "name": "Upload media",
+      "webhookId": "40af6b01-bcea-4b5e-9ecd-0828ac4aba7b",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "5TJkebMKhMYX4Xqh",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "for (const item of $input.all()) {\n  item.binary.data.mimeType = 'audio/mpeg';\n  item.binary.data.fileName = 'voice.mp3';\n}\nreturn $input.all();"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        688,
+        480
+      ],
+      "id": "ec70faaf-bdc2-4193-a5a1-c938de5a1a5c",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "resource": "speech",
+        "voice": {
+          "__rl": true,
+          "value": "TX3LPaxmHKxFdv7VOQHJ",
+          "mode": "list",
+          "cachedResultName": "Liam - Energetic, Social Media Creator"
+        },
+        "text": "={{ $json.output }}",
+        "additionalOptions": {},
+        "requestOptions": {}
+      },
+      "type": "@elevenlabs/n8n-nodes-elevenlabs.elevenLabs",
+      "typeVersion": 1,
+      "position": [
+        960,
+        32
+      ],
+      "id": "a8866a42-a035-470b-a49a-892dd83f7168",
+      "name": "Convert text to speech",
+      "credentials": {
+        "elevenLabsApi": {
+          "id": "FbIoFSMj3RFT0WXY",
+          "name": "ElevenLabs account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "messageType": "audio",
+        "mediaPath": "useMediaId",
+        "mediaId": "={{ $json.id }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        1024,
+        480
+      ],
+      "id": "2940dc5c-b4f3-401f-9efb-4ba960ede9c7",
+      "name": "Send message1",
+      "webhookId": "d000e50a-0691-47b0-b0b9-48d69cc1345c",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "5TJkebMKhMYX4Xqh",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        544,
+        128
+      ],
+      "id": "195ecec5-bf30-4729-94fa-ef859ee7f6d5",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// هنجيب النص اللي طالع من الـ AI\nlet text = $json.output || \"\"; \n\n// 1. مسح الجملة المزعجة بأي شكل تظهر بيه (حتى لو الحروف متقطعة)\ntext = text.replace(/Here are (two )?helpful.*get you started:?/gi, '');\ntext = text.replace(/Here are some helpful links:?/gi, '');\n\n// 2. مسح أي أقواس مربعة أو مدورة فاضية أو جواها كلام (بقايا اللينكات)\ntext = text.replace(/\\[.*?\\]/g, ''); // بيمسح أي حاجة بين [ ]\ntext = text.replace(/\\(.*?\\)/g, ''); // بيمسح أي حاجة بين ( )\n\n// 3. مسح كلمة \"لينك\" أو \"link\" أو \"Screenpal\"\ntext = text.replace(/(لينك|رابط|اللينك|الرابط|link|links|screenpal)/gi, '');\n\n// 5. تنظيف المسافات الزيادة والسطور الجديدة والرموز الغريبة اللي باقية\nconst cleanText = text.replace(/\\n/g, ' ')      // تحويل السطور الجديدة لمسافات\n                      .replace(/\\s\\s+/g, ' ')   // مسح المسافات المتكررة\n                      .replace(/[:\\.]\\s*$/g, '') // مسح النقطة أو النقطتين لو في آخر الجملة\n                      .trim();\n\nreturn {\n  output: cleanText\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        432,
+        320
+      ],
+      "id": "c52476c6-e941-4f18-9121-f8fd95c51a3f",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "={{ $('WhatsApp Trigger').item.json.metadata.phone_number_id }}",
+        "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $json.message }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        672,
+        752
+      ],
+      "id": "23a5e5e5-9fa9-4edf-9abe-15730b569f29",
+      "name": "Send message2",
+      "webhookId": "f2a0a9c0-9652-49f2-8807-9b82eaebe6a1",
+      "credentials": {
+        "whatsAppApi": {
+          "id": "5TJkebMKhMYX4Xqh",
+          "name": "WhatsApp account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "n8n_History",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "Name",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.contacts[0].profile.name }}"
+            },
+            {
+              "fieldId": "Phone",
+              "fieldValue": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}"
+            },
+            {
+              "fieldId": "Chat History",
+              "fieldValue": "={{ $json.output }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "4626423e-817a-4200-82f2-ba109b4352c3",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "bdp7Ge0FfCSktpvo",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// خذ نص رد البوت من النود اللي قبله\nconst botResponse = $input.item.json.output || \"\"; \n\n// لينك المنصة الثابت\nconst platformLink = \"https://i3tamid.om/\";\n\n// جدول الروابط بناءً على ملفات سوبابيز اللي رفعتها\nconst links = {\n  'Leadership': 'https://mgqtjshmbcelhxksnlfz.supabase.co/storage/v1/object/public/i3tamid/Leadership_Classification_Job_Description_Form_Formatted.docx',\n  'Specialist': 'https://mgqtjshmbcelhxksnlfz.supabase.co/storage/v1/object/public/i3tamid/Specialist_Level_Job_Description_Form_English.docx',\n  'Technical': 'https://mgqtjshmbcelhxksnlfz.supabase.co/storage/v1/object/public/i3tamid/Technical_Level_Job_Description_Form_English.docx',\n  'Supervisory': 'https://mgqtjshmbcelhxksnlfz.supabase.co/storage/v1/object/public/i3tamid/Supervisory_classification_Job_Description%20form.docx',\n  'ClassificationSteps': 'https://mgqtjshmbcelhxksnlfz.supabase.co/storage/v1/object/public/i3tamid/Professional%20Classification%20Steps.pdf',\n  'LicensingSteps': 'https://mgqtjshmbcelhxksnlfz.supabase.co/storage/v1/object/public/i3tamid/Professional%20Licensing%20Steps.pdf'\n};\n\n// البحث عن التصنيف جوه رد البوت\nlet selectedLink = \"\";\nif (botResponse.includes('Leadership')) selectedLink = links.Leadership;\nelse if (botResponse.includes('Specialist')) selectedLink = links.Specialist;\nelse if (botResponse.includes('Technical')) selectedLink = links.Technical;\nelse if (botResponse.includes('Supervisory')) selectedLink = links.Supervisory;\nelse if (botResponse.includes('التصنيف المهني') || botResponse.includes('Classification')) selectedLink = links.ClassificationSteps;\nelse if (botResponse.includes('الترخيص المهني') || botResponse.includes('مزاولة المهنة') || botResponse.includes('Licensing')) selectedLink = links.LicensingSteps;\n\n// تجهيز الرسالة النهائية\nlet finalMessage = \"\";\n\nif (selectedLink !== \"\") {\n    // لو فيه استمارة أو ملف خطوات، يبعت رابط الملف ورابط المنصة\n    finalMessage = `تفضل الرابط الخاص بطلبك:\\n${selectedLink}\\n\\nرابط المنصة:\\n${platformLink}`;\n} else {\n    // لو مفيش تصنيف (رد عام)، يبعت رابط المنصة بس\n    finalMessage = `رابط المنصة:\\n${platformLink}`;\n}\n\nreturn {\n    message: finalMessage,\n    selectedLink: selectedLink\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        272,
+        640
+      ],
+      "id": "7490afcb-212b-4cce-9b01-ad44f978ce7d",
+      "name": "Code in JavaScript2"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "input": "={{ $json.output }}",
+        "voice": "nova",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.1,
+      "position": [
+        464,
+        512
+      ],
+      "id": "2616d23f-c9d7-4ec3-93e6-d7ae98dd2438",
+      "name": "Generate audio",
+      "credentials": {
+        "openAiApi": {
+          "id": "8FchnRRbkOizmgoI",
+          "name": "OpenAI account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Switch1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase Vector Store1": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          },
+          {
+            "node": "Supabase Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Code in JavaScript2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Upload media",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload media": {
+      "main": [
+        [
+          {
+            "node": "Send message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Generate audio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript2": {
+      "main": [
+        [
+          {
+            "node": "Send message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate audio": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "29d24b05-3639-4514-b31c-6cac94871389",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "63fc54770af815f145b9771b7280d33c4c897ef8e1a7c037fc423c03d2741f3e"
+  },
+  "id": "OOnlN1iNMsrn4wNs",
+  "tags": []
+}
